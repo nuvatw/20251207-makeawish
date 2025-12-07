@@ -5,191 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Make a Wish ✨</title>
 
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css" />
+
     <!-- Supabase JavaScript client from a CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Supabase provides this CDN link for using the JS client in the browser -->
-    <!-- docs: supabase.com/docs/reference/javascript/installing -->
-
-    <style>
-      /* Just making it look nice */
-      * {
-        box-sizing: border-box;
-      }
-
-      body {
-        margin: 0;
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-          sans-serif;
-        background: radial-gradient(circle at top, #1e293b, #020617);
-        color: #e5e7eb;
-      }
-
-      .card {
-        background: #020617;
-        border-radius: 16px;
-        padding: 24px 24px 18px;
-        width: 100%;
-        max-width: 420px;
-        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
-        border: 1px solid #1f2937;
-      }
-
-      h1 {
-        margin: 0 0 12px;
-        font-size: 24px;
-        text-align: center;
-      }
-
-      p.subtitle {
-        margin: 0 0 20px;
-        text-align: center;
-        font-size: 14px;
-        color: #9ca3af;
-      }
-
-      label {
-        display: block;
-        margin-bottom: 8px;
-        font-size: 14px;
-      }
-
-      textarea {
-        width: 100%;
-        min-height: 120px;
-        padding: 10px 12px;
-        border-radius: 10px;
-        border: 1px solid #4b5563;
-        background: #020617;
-        color: #e5e7eb;
-        resize: vertical;
-        font-size: 14px;
-      }
-
-      textarea:focus {
-        outline: 2px solid #22c55e;
-        outline-offset: 2px;
-      }
-
-      small {
-        display: block;
-        margin-top: 6px;
-        font-size: 11px;
-        color: #9ca3af;
-      }
-
-      button {
-        margin-top: 14px;
-        width: 100%;
-        padding: 10px 16px;
-        border-radius: 999px;
-        border: none;
-        background: #22c55e;
-        color: #022c22;
-        font-weight: 600;
-        font-size: 15px;
-        cursor: pointer;
-      }
-
-      button:disabled {
-        opacity: 0.6;
-        cursor: default;
-      }
-
-      .status {
-        margin-top: 10px;
-        font-size: 13px;
-        min-height: 18px;
-      }
-
-      .status.error {
-        color: #f87171;
-      }
-
-      .status.success {
-        color: #4ade80;
-      }
-    </style>
   </head>
   <body>
     <div class="card">
       <h1>Make a Wish ✨</h1>
-      <p class="subtitle">Write your wish and send it to the stars.</p>
 
-      <form id="wish-form">
+      <!-- AUTH SECTION -->
+      <div id="auth-section">
+        <p id="welcome-text">Checking login...</p>
+
+        <button id="login-button" type="button">
+          Sign in with Google
+        </button>
+
+        <button id="logout-button" type="button" style="display: none">
+          Log out
+        </button>
+      </div>
+
+      <!-- WISH FORM (only when logged in) -->
+      <form id="wish-form" style="display: none">
         <label for="wish-input">Your wish</label>
         <textarea
           id="wish-input"
           placeholder="I wish for..."
         ></textarea>
-        <small>Don’t put passwords or super private info here. Think of it like writing on a public wall.</small>
+        <small>
+          Don’t put passwords or super private info here. Think of it like
+          writing on a public wall.
+        </small>
 
         <button type="submit" id="submit-btn">Send wish</button>
         <div id="status" class="status"></div>
       </form>
     </div>
 
-    <script>
-      // 1. Put your real Supabase details here:
-      const SUPABASE_URL = "https://ggngkbgqupecnrfhqpyr.supabase.co"; // <- change this
-      const SUPABASE_ANON_KEY = "sb_publishable_yjkEM-3_qECtrdRb0rEucQ_q-ODnLA5"; // <- change this
-
-      // 2. Create a Supabase client using the global "supabase" from the CDN
-      // docs show this pattern for script tags:
-      // const { createClient } = supabase
-      // const client = createClient(url, key) :contentReference[oaicite:3]{index=3}
-      const { createClient } = supabase;
-      const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-      const form = document.getElementById("wish-form");
-      const wishInput = document.getElementById("wish-input");
-      const statusEl = document.getElementById("status");
-      const submitBtn = document.getElementById("submit-btn");
-
-      function setStatus(message, type) {
-        statusEl.textContent = message;
-        statusEl.className = "status " + (type || "");
-      }
-
-      form.addEventListener("submit", async (event) => {
-        event.preventDefault();
-
-        const wish = wishInput.value.trim();
-
-        if (!wish) {
-          setStatus("Please type a wish first 😊", "error");
-          return;
-        }
-
-        submitBtn.disabled = true;
-        setStatus("Sending your wish...", "");
-
-        try {
-            const { error } = await db
-                .from("wishes")
-                .insert([{ wish }], { returning: "minimal" });
-
-            if (error) {
-                console.error(error);
-                setStatus(
-                "Oops, could not send your wish. Check the console or try again.",
-                "error"
-                );
-            } else {
-                setStatus("Wish sent! ✨", "success");
-                wishInput.value = "";
-            }
-            } catch (err) {
-            console.error(err);
-            setStatus("Something went wrong. Check the console.", "error");
-            } finally {
-            submitBtn.disabled = false;
-        }
-
-      });
-    </script>
+    <!-- Your app logic -->
+    <script src="app.js"></script>
   </body>
 </html>
